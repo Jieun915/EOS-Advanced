@@ -8,7 +8,7 @@
 1. **Firebase 초기화 코드 구현**
    - Firebase 프로젝트 설정 및 Flutter 앱 연결
    - 필요한 구성 파일 설치 (google-services.json, GoogleService-Info.plist)
-   - Firebase 초기화 코드 구현
+   - Firebase 초기화 코드 구현vzvczxDcxvaxD
 
 2. **로그인 상태에 따른 화면 분기 처리**
    - FirebaseAuth.authStateChanges()를 활용한 인증 상태 모니터링
