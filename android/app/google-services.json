@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "147898159486",
+    "project_id": "eosjien",
+    "storage_bucket": "eosjien.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:147898159486:android:f27ad2ecb043e354d8a32f",
+        "android_client_info": {
+          "package_name": "com.example.eos_advance_login"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAqzMVNnayF1GwJJCafjYoRR96MWI2QuYI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

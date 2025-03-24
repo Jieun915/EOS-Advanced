@@ -1,132 +1,183 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:eos_advance_login/theme/light_theme.dart';
 import 'package:eos_advance_login/theme/foundation/app_theme.dart';
+import 'package:eos_advance_login/screens/home_screen.dart';
 
-/// 홈 화면 - 로그인 성공 후 표시되는 화면입니다.
-/// Firebase Auth를 사용한 로그아웃 기능을 구현해야 합니다.
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({Key? key}) : super(key: key);
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isPasswordVisible = false;
+  late final AppTheme theme = LightTheme();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final AppTheme theme = LightTheme();
-
-    return Scaffold(
-      backgroundColor: theme.color.surface,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // 환영 메시지 - 크게 표시
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-              margin: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: theme.color.background,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: theme.color.primary, width: 2),
-              ),
-              child: Column(
-                children: [
-                  Text(
-                    'EOS Advance 2주차 과제를',
-                    style: theme.typo.body1.copyWith(
-                      color: theme.color.primary,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    '완료하신 여러분들 환영합니다!',
-                    style: theme.typo.body1.copyWith(
-                      color: theme.color.primary,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 20),
-                  Icon(
-                    Icons.celebration,
-                    size: 48,
-                    color: theme.color.primary,
-                  ),
-                ],
-              ),
-            ),
-
-            // TODO: [과제 3-1] 현재 로그인한 사용자 정보 표시
-            /*
-             * 1. 사용자 정보 가져오기:
-              *    final user = FirebaseAuth.instance.currentUser;
-              *    
-              * 2. 사용자 이메일 표시:
-              *    Text(user?.email ?? '로그인 필요')
-             * - FirebaseAuth.instance.currentUser?.email을 사용하여 사용자 이메일 가져오기
-             * - 사용자 정보가 없는 경우 대체 텍스트 표시
-             */
-
-            // 추가 정보 메시지
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Text(
-                '로그인에 성공하셨습니다!',
-                style: theme.typo.body1.copyWith(
-                  color: theme.color.subtext,
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: theme.color.surface,
+        body: SafeArea(
+          child: Column(
+            children: [
+              // EOS 로고 표시
+              Container(
+                alignment: Alignment.center,
+                padding: const EdgeInsets.only(top: 40, bottom: 24),
+                child: Image.asset(
+                  'assets/images/eos_logo.png',
+                  width: 360,
+                  height: 144,
                 ),
               ),
-            ),
-
-            // 로그아웃 버튼
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: SizedBox(
-                width: 240,
-                height: 54,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.color.primary,
-                    foregroundColor: theme.color.onPrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  children: [
+                    // 이메일 입력 필드
+                    _buildTextField(
+                      controller: _emailController,
+                      labelText: '이메일',
+                      prefixIcon: Icons.email_outlined,
+                      keyboardType: TextInputType.emailAddress,
                     ),
-                    elevation: 0, // 그림자 효과 제거
-                  ),
-                  onPressed: () => _handleLogout(context),
-                  child: Text(
-                    '로그아웃',
-                    style: theme.typo.body1.copyWith(
-                      color: theme.color.onPrimary,
+                    const SizedBox(height: 16),
+                    // 비밀번호 입력 필드
+                    _buildTextField(
+                      controller: _passwordController,
+                      labelText: '비밀번호',
+                      prefixIcon: Icons.lock_outline,
+                      obscureText: !_isPasswordVisible,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: theme.color.subtext,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 24),
+                    // 로그인 버튼
+                    _buildButton(
+                      text: '로그인',
+                      onPressed: () => _handleEmailLogin(context),
+                      backgroundColor: theme.color.primary,
+                      textColor: theme.color.onPrimary,
+                    ),
+                    const SizedBox(height: 16),
+                    // 비밀번호 찾기 & 회원가입 링크
+                    _buildAccountActions(),
+                  ],
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  // 로그아웃 처리 메서드
-  void _handleLogout(BuildContext context) {
-    // TODO: [과제 3-2] Firebase Auth를 사용한 로그아웃 구현
-    /*
-     * 로그아웃 기능 구현 과제
-     * 
-     * 구현 단계:
-     * 1. Firebase 로그아웃 처리
-     *    try {
-     *      await FirebaseAuth.instance.signOut();
-     *      // authStateChanges()를 사용 중이라면 자동으로 로그인 화면으로 이동
-     *    } catch (e) {
-     *      // 오류 처리
-     *      ScaffoldMessenger.of(context).showSnackBar(
-     *        SnackBar(content: Text('로그아웃 중 오류가 발생했습니다: $e')),
-     *      );
-     *    }
-     * 
-     * 2. 수동 화면 이동 (필요한 경우)
-     *    - Navigator.of(context).pushAndRemoveUntil()을 사용하여
-     *      화면 스택을 비우고 로그인 화면으로 이동
-     */
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    required IconData prefixIcon,
+    TextInputType keyboardType = TextInputType.text,
+    bool obscureText = false,
+    Widget? suffixIcon,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      obscureText: obscureText,
+      style: theme.typo.body1,
+      decoration: InputDecoration(
+        labelText: labelText,
+        labelStyle: theme.typo.subtitle2.copyWith(color: theme.color.subtext),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: theme.color.hint, width: 1.5),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: theme.color.inactive, width: 1.5),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: theme.color.primary, width: 2),
+        ),
+        filled: true,
+        fillColor: theme.color.background.withOpacity(0.3),
+        prefixIcon: Icon(prefixIcon, color: theme.color.primary),
+        suffixIcon: suffixIcon,
+      ),
+    );
   }
-}
+
+  Widget _buildButton({
+    required String text,
+    required VoidCallback onPressed,
+    required Color backgroundColor,
+    required Color textColor,
+  }) {
+    return SizedBox(
+      width: double.infinity,
+      height: 54,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor,
+          foregroundColor: textColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+          elevation: 0,
+        ),
+        onPressed: onPressed,
+        child: Text(
+          text,
+          style: theme.typo.subtitle1.copyWith(color: textColor),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAccountActions() {
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+        TextButton(
+        onPressed: () {},
+    child: Text(
+    '비밀번호 재설정',
+    style: theme.typo.body1.copyWith(color: theme.color.subtext),
+    ),
+    ),
+    Container(
+    height: 16,
+    width: 1,
+    color: theme.color.hint,
+    margin: const EdgeInsets.symmetric(horizontal: 8),
+    ),
+    TextButton(
+    onPressed: () {},
+    child: Text(
+    '회원가입',
+    style: theme.typo.body1.copy
