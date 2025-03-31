@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "145551522874",
-    "project_id": "eos-advance",
-    "storage_bucket": "eos-advance.firebasestorage.app"
+    "project_number": "538482989886",
+    "project_id": "eos-f6de1",
+    "storage_bucket": "eos-f6de1.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:145551522874:android:11752679284c73c548c903",
+        "mobilesdk_app_id": "1:538482989886:android:81642610407acc6bcc6a6f",
         "android_client_info": {
           "package_name": "com.example.eos_advance_login"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA7BgB5ix2bqQeZz4M5ajvB8ej0YgEmuHM"
+          "current_key": "AIzaSyC0FzeCATCV-95EDXwwteIX9gm0HgdkYFQ"
         }
       ],
       "services": {
